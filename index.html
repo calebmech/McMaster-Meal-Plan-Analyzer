@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Meal Plan Analysis</title>
+    <script src="func.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="bootstrap-reboot.min.css">
+</head>
+<body>
+
+<div class="wrapper">
+
+<form id="form">
+    <div id="scrapper">
+        <p for="rawTransactionData">Copy and paste all data from <a href="https://mealacct.mcmaster.ca/OneWeb/Account">Meal Plan Account</a> > Financial > Transations:</p>
+        <textarea name="rawTransactionData" id="rawTransactionData" cols="60" rows="5"></textarea>
+    </div>
+    <div id="options">        
+        <p>
+            <label for="mealPlanOptions">Meal Plan:</label>
+            <select name="mealPlanOptions" id="mealPlanOptions">
+                <option value="groupA.minimum">Group A - Minimum</option>
+                <option value="groupA.minimum">Group A - Light</option>
+                <option value="groupA.regular">Group A - Regular</option>
+                <option value="groupA.varsity">Group A - Varsity</option>
+                <option disabled="disabled">------------------------</option>
+                <option value="groupB.minimum">Group B - Minimum</option>
+                <option value="groupB.minimum">Group B - Light</option>
+                <option value="groupB.regular">Group B - Regular</option>
+                <option value="groupB.varsity">Group B - Varsity</option>
+            </select>
+        </p>
+
+        <p>
+            <label for="prcntWeeksAway">Percentage of weeks away:</label>
+            <input type="number" min="0" max="100" step"1" name="prcntWeeksAway" id="prcntWeeksAway" placeholder="25">
+        </p>
+
+        <p>
+            <p>Reading weeks away:</p>
+            <label for="awayFallReadingWeek">Fall:</label>
+            <input type="checkbox" name="awayFallReadingWeek" id="awayFallReadingWeek">
+            <label for="awayWinterReadingWeek">Winter:</label>
+            <input type="checkbox" name="awayWinterReadingWeek" id="awayWinterReadingWeek">
+        </p>
+
+        <p>
+            <label for="extraDaysAway">Extra Days Away</label>
+            <input type="number" name="extraDaysAway" id="extraDaysAway" placeholder="0">
+        </p>
+        
+        <p>
+            <label for="lastExamDayFall">Last fall exam day:</label>
+            <input type="number" name="lastExamDayFall" id="lastExamDayFall" placeholder="Default: 21">
+            <label for="lastExamDayWinter">Last winter exam day:</label>
+            <input type="number" name="lastExamDayWinter" id="lastExamDayWinter" placeholder="Default: 26">
+        </p>
+    </div>
+    <div id="submit">
+        <p>
+            <input type="submit" value="Calculate">
+        </p>
+    </div>
+</form>
+
+<hr>
+
+<div id="output" class="hide">
+
+    <h1 id="avgSpent">Average Spent Per Day: <span class="output"></span></h1>
+    <h2 id="allowedSpending">You are allowed to spend: <span class="output"></span></h2>
+
+
+</div>
+
+</div>
+
+<script>
+
+document.getElementById("form").addEventListener("submit", function(e) {
+
+    e.preventDefault();
+
+    var cpdata = document.getElementById("rawTransactionData").value;
+    var mealPlan = document.getElementById("mealPlanOptions").value;
+    var initialBalance = mealPlanAmounts[mealPlan.split(".")[0]][mealPlan.split(".")[1]];
+    var prcntWeekendsAway = document.getElementById("prcntWeeksAway").value / 100;
+    if (!prcntWeekendsAway) {prcntWeekendsAway=0};
+    var readingWeekAwayF = document.getElementById("awayFallReadingWeek").checked;
+    var readingWeekAwayW = document.getElementById("awayWinterReadingWeek").checked;
+    var numIndvDaysAway = document.getElementById("extraDaysAway").value;
+    if (!numIndvDaysAway) {numIndvDaysAway=0};
+    var lastExamDayF = document.getElementById("lastExamDayFall").value;
+    if (!lastExamDayF) {lastExamDayF=21};
+    var lastExamDayW = document.getElementById("lastExamDayWinter").value;
+    if (!lastExamDayW) {lastExamDayW=26};
+
+    allowedSpending = calcAllowedSpending(initialBalance, prcntWeekendsAway, readingWeekAwayF, readingWeekAwayW, numIndvDaysAway, lastExamDayF, lastExamDayW);
+    //console.log(cpdata);
+    trns = parseData(cpdata);
+    totalSpent = calcTotalSpent(trns);
+    avgSpent = calcAvgSpent(totalSpent);
+    
+    console.log(trns);
+    console.log(totalSpent);
+    console.log(avgSpent);
+    console.log(allowedSpending);
+
+    el_avgSpent = document.querySelector("#avgSpent .output");
+    el_avgSpent.innerHTML = "$" + avgSpent;
+    if (avgSpent < allowedSpending*0.85) {
+        el_avgSpent.style.color = "green";
+    } else if (avgSpent <= allowedSpending) {
+        el_avgSpent.style.color = "orange";
+    } else {
+        el_avgSpent.style.color = "red";
+    }
+    
+    el_allowedSpending = document.querySelector("#allowedSpending .output");
+    el_allowedSpending.innerHTML = "$" + allowedSpending;
+
+    document.getElementById("output").classList.remove("hide");
+
+});
+
+</script>
+</body>
+</html>
