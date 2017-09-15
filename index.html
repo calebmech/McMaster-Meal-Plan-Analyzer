@@ -8,27 +8,28 @@
     <script src="func.js"></script>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="bootstrap-reboot.min.css">
+    <script src="https://unpkg.com/vue@2.4.4/dist/vue.js"></script>
 </head>
 <body>
 
-<div class="wrapper">
+<div id="app" class="wrapper">
 
 <form id="form">
     <div id="scrapper">
         <p for="rawTransactionData">Copy and paste all data from <a href="https://mealacct.mcmaster.ca/OneWeb/Account">Meal Plan Account</a> > Financial > Transations:</p>
-        <textarea name="rawTransactionData" id="rawTransactionData" cols="60" rows="5"></textarea>
+        <textarea name="rawTransactionData" id="rawTransactionData" cols="60" rows="5" v-model="cpdata"></textarea>
     </div>
     <div id="options">        
         <p>
             <label for="mealPlanOptions">Meal Plan:</label>
-            <select name="mealPlanOptions" id="mealPlanOptions">
+            <select name="mealPlanOptions" id="mealPlanOptions" v-model="mealPlan">
                 <option value="groupA.minimum">Group A - Minimum</option>
-                <option value="groupA.minimum">Group A - Light</option>
+                <option value="groupA.light">Group A - Light</option>
                 <option value="groupA.regular">Group A - Regular</option>
                 <option value="groupA.varsity">Group A - Varsity</option>
                 <option disabled="disabled">------------------------</option>
                 <option value="groupB.minimum">Group B - Minimum</option>
-                <option value="groupB.minimum">Group B - Light</option>
+                <option value="groupB.light">Group B - Light</option>
                 <option value="groupB.regular">Group B - Regular</option>
                 <option value="groupB.varsity">Group B - Varsity</option>
             </select>
@@ -36,27 +37,27 @@
 
         <p>
             <label for="prcntWeeksAway">Percentage of weeks away:</label>
-            <input type="number" min="0" max="100" step"1" name="prcntWeeksAway" id="prcntWeeksAway" placeholder="25">
+            <input type="number" min="0" max="100" step="1" name="prcntWeekendsAway" id="prcntWeekendsAway" placeholder="25" v-model="prcntWeekendsAway">
         </p>
 
         <p>
             <p>Reading weeks away:</p>
             <label for="awayFallReadingWeek">Fall:</label>
-            <input type="checkbox" name="awayFallReadingWeek" id="awayFallReadingWeek">
+            <input type="checkbox" name="awayFallReadingWeek" id="awayFallReadingWeek" v-model="readingWeekAwayF">
             <label for="awayWinterReadingWeek">Winter:</label>
-            <input type="checkbox" name="awayWinterReadingWeek" id="awayWinterReadingWeek">
+            <input type="checkbox" name="awayWinterReadingWeek" id="awayWinterReadingWeek" v-model="readingWeekAwayW">
         </p>
 
         <p>
             <label for="extraDaysAway">Extra Days Away</label>
-            <input type="number" name="extraDaysAway" id="extraDaysAway" placeholder="0">
+            <input type="number" name="extraDaysAway" id="extraDaysAway" placeholder="0" v-model="numIndvDaysAway">
         </p>
         
         <p>
             <label for="lastExamDayFall">Last fall exam day:</label>
-            <input type="number" name="lastExamDayFall" id="lastExamDayFall" placeholder="Default: 21">
+            <input type="number" name="lastExamDayFall" id="lastExamDayFall" placeholder="Default: 21" v-model="lastExamDayF">
             <label for="lastExamDayWinter">Last winter exam day:</label>
-            <input type="number" name="lastExamDayWinter" id="lastExamDayWinter" placeholder="Default: 26">
+            <input type="number" name="lastExamDayWinter" id="lastExamDayWinter" placeholder="Default: 26" v-model="lastExamDayW">
         </p>
     </div>
     <div id="submit">
@@ -68,10 +69,10 @@
 
 <hr>
 
-<div id="output" class="hide">
+<div id="output" v-if="cpdata">
 
-    <h1 id="avgSpent">Average Spent Per Day: <span class="output"></span></h1>
-    <h2 id="allowedSpending">You are allowed to spend: <span class="output"></span></h2>
+    <h1 id="avgSpent">Average Spent Per Day: <span class="output" v-bind:style="{ color: spendingColor }">{{ avgSpent }}</span></h1>
+    <h2 id="allowedSpending">You are allowed to spend: <span class="output">{{ allowedSpending }}</span></h2>
 
 
 </div>
@@ -80,51 +81,195 @@
 
 <script>
 
-document.getElementById("form").addEventListener("submit", function(e) {
+var vm = new Vue({
+    el: '#app',
+    data: {
+        cpdata: `Logo Image	
 
-    e.preventDefault();
+ACCOUNT 
+FINANCIAL 
+ADD CASH
+ LOG OFF
+Transactions
+Quick Search
+Past 30 days
+Past 60 days
+Select a Date Range
+ From:   
+08/26/2017
+ To:   
+09/14/2017
+  
+Date	Amount	Balance	Units	Trantype	Terminal
+09/14/2017 7:02:20 PM	-$4.27	1	0	004 : VEND (MONEY)	00084 : BRIDGES-1
+09/14/2017 11:45:44 AM	-$4.24	1	0	004 : VEND (MONEY)	00011 : LAPIAZZA-1
+09/13/2017 7:08:43 PM	-$3.67	1	0	004 : VEND (MONEY)	00084 : BRIDGES-1
+09/13/2017 12:23:54 PM	-$3.75	1	0	004 : VEND (MONEY)	00021 : LAPIAZZA-3
+09/12/2017 7:46:28 PM	-$1.04	1	0	004 : VEND (MONEY)	00046 : MMM-TH
+09/12/2017 6:48:21 PM	-$3.57	1	0	004 : VEND (MONEY)	00046 : MMM-TH
+09/12/2017 12:42:20 PM	-$3.97	1	0	004 : VEND (MONEY)	00048 : LAPIAZZA-4
+09/11/2017 6:55:31 PM	-$2.97	1	0	004 : VEND (MONEY)	00048 : LAPIAZZA-4
+09/11/2017 1:55:52 PM	-$4.12	1	0	004 : VEND (MONEY)	00063 : MMM-1
+09/08/2017 5:47:31 PM	-$3.99	1	0	004 : VEND (MONEY)	00015 : TERIYAKI (MIJ)
+09/07/2017 6:29:31 PM	-$5.94	1	0	004 : VEND (MONEY)	00060 : EMW-2
+09/07/2017 1:32:23 PM	-$3.72	1	0	004 : VEND (MONEY)	00048 : LAPIAZZA-4
+09/06/2017 6:46:53 PM	-$4.99	1	0	004 : VEND (MONEY)	00037 : CENTRO 1
+09/06/2017 12:27:48 PM	-$1.79	1	0	004 : VEND (MONEY)	00138 : LAPIAZZA-2
+09/05/2017 12:08:26 PM	-$4.28	1	0	004 : VEND (MONEY)	00015 : TERIYAKI (MIJ)
+09/01/2017 6:03:16 PM	-$5.60	1	0	004 : VEND (MONEY)	00046 : MMM-TH
+09/01/2017 10:28:46 AM	-$1.92	1	0	004 : VEND (MONEY)	00063 : MMM-1
+08/31/2017 11:18:15 AM	-$4.99	1	0	004 : VEND (MONEY)	00031 : CENTRO 3
+08/30/2017 5:06:23 PM	-$6.49	1	0	004 : VEND (MONEY)	00025 : EMW-1
+08/30/2017 12:25:48 PM	-$3.47	1	0	004 : VEND (MONEY)	00138 : LAPIAZZA-2
+08/28/2017 5:30:38 PM	-$3.57	1	0	004 : VEND (MONEY)	00046 : MMM-TH
+08/28/2017 1:53:28 PM	-$7.02	1	0	004 : VEND (MONEY)	00025 : EMW-1
+08/28/2017 8:29:32 AM	-$4.40	1	0	004 : VEND (MONEY)	00040 : CENTRO 2
+08/26/2017 1:29:18 PM	-$12.95	1	0	102 : ACCOUNT ADJUSTMENT	00053 : FABO MANAGER
+ 2014 Heartland Campus Solutions
+OneWeb ver. 6.9.1.20`,
+        mealPlan: "groupA.minimum",
+        prcntWeekendsAway: 10,
+        readingWeekAwayF: true,
+        readingWeekAwayW: true,
+        numIndvDaysAway: 0,
+        lastExamDayF: 21,
+        lastExamDayW: 26,
+        numWeekendsAway: 0
+    },
+    computed: {
+        initialBalance: function() {
+            return mealPlanAmounts[this.mealPlan.split(".")[0]][this.mealPlan.split(".")[1]];
+        },
+        trns: function() {
+            var data = this.cpdata
 
-    var cpdata = document.getElementById("rawTransactionData").value;
-    var mealPlan = document.getElementById("mealPlanOptions").value;
-    var initialBalance = mealPlanAmounts[mealPlan.split(".")[0]][mealPlan.split(".")[1]];
-    var prcntWeekendsAway = document.getElementById("prcntWeeksAway").value / 100;
-    if (!prcntWeekendsAway) {prcntWeekendsAway=0};
-    var readingWeekAwayF = document.getElementById("awayFallReadingWeek").checked;
-    var readingWeekAwayW = document.getElementById("awayWinterReadingWeek").checked;
-    var numIndvDaysAway = document.getElementById("extraDaysAway").value;
-    if (!numIndvDaysAway) {numIndvDaysAway=0};
-    var lastExamDayF = document.getElementById("lastExamDayFall").value;
-    if (!lastExamDayF) {lastExamDayF=21};
-    var lastExamDayW = document.getElementById("lastExamDayWinter").value;
-    if (!lastExamDayW) {lastExamDayW=26};
+            // var headerString = "Date	Amount	Balance	Units	Trantype	Terminal";
+            // var headerEndPos = findStringEndPos(data, headerString);
 
-    allowedSpending = calcAllowedSpending(initialBalance, prcntWeekendsAway, readingWeekAwayF, readingWeekAwayW, numIndvDaysAway, lastExamDayF, lastExamDayW);
-    //console.log(cpdata);
-    trns = parseData(cpdata);
-    totalSpent = calcTotalSpent(trns);
-    avgSpent = calcAvgSpent(totalSpent);
-    
-    console.log(trns);
-    console.log(totalSpent);
-    console.log(avgSpent);
-    console.log(allowedSpending);
+            // var footerString = "2014 Heartland Campus Solutions"
+            // var footerStartPos = data.search(footerString);
 
-    el_avgSpent = document.querySelector("#avgSpent .output");
-    el_avgSpent.innerHTML = "$" + avgSpent;
-    if (avgSpent < allowedSpending*0.85) {
-        el_avgSpent.style.color = "green";
-    } else if (avgSpent <= allowedSpending) {
-        el_avgSpent.style.color = "orange";
-    } else {
-        el_avgSpent.style.color = "red";
+            // data = (data.substring(headerEndPos+1, footerStartPos));
+            
+            
+            var date = data.match(/\d{2}\/\d{2}\/\d{4}/g);
+            var time = data.match(/\d{1,2}:\d{2}:\d{2} (?:PM|AM)/g);
+            var amount = data.match(/-\$\d{1,}.\d{2}/g);
+            var place = data.match(/[0-9]{5} : [A-Z]{1,}/g);
+            
+            var numTrns = amount.length;
+
+            var trns = [];
+
+            for (i = 0; i < numTrns; i++) { 
+                trns.push({ 
+                    date: date[i+2], 
+                    time: time[i],
+                    amount: amount[i],
+                    place: place[i].slice(8) // Fix this hack with regex
+                });
+            };
+
+            trns.reverse();
+            return trns;
+        },
+        totalSpent: function() {
+            var totalSpent = 0;
+            this.trns.forEach(function(transation) {
+                if(transation.amount[0] === "-") {
+                    totalSpent += parseFloat(transation.amount.slice(2)) * 2;
+                }
+            });
+            totalSpent = totalSpent.toFixed(2);
+            return totalSpent;
+        },
+        avgSpent: function() {
+            var stmntStartDate = Date.parse(this.trns[0].date);
+            var stmntEndDate = Date.parse(this.trns[this.trns.length-1].date)
+
+            var stmntLength = elapsedDays(stmntStartDate, stmntEndDate);
+
+            // Calculate Average Spent per Day
+
+            var avgSpent = this.totalSpent / stmntLength;
+            var avgSpent = avgSpent.toFixed(2);
+            return avgSpent;
+        },
+        allowedSpending: function() {
+            var startDateF = new Date(2017, 08, 05).getTime();
+            var endDateF = new Date(2017, 11, this.lastExamDayF).getTime();
+            var startDateW = new Date(2018, 01, 04).getTime();
+            var endDateW = new Date(2018, 04, this.lastExamDayW).getTime();
+
+            var totalDays = elapsedDays(startDateF, endDateF) + elapsedDays(startDateW, endDateW);
+
+            var numWeeksTotal = Math.floor(totalDays / 7);
+            this.numWeekendsAway = numWeeksTotal * this.prcntWeekendsAway/100;
+            var numDaysAway = (this.numWeekendsAway*2) + this.numIndvDaysAway + this.readingWeekAwayF*9 + this.readingWeekAwayW*9;
+            var payingDays = totalDays - numDaysAway;
+            var allowedSpending = this.initialBalance / payingDays;
+
+            return allowedSpending.toFixed(2);
+        },
+        spendingColor: function() {
+            spendingColor = "black";
+            if (this.avgSpent < this.allowedSpending*0.85) {
+                spendingColor = "green";
+            } else if (this.avgSpent <= this.allowedSpending) {
+                spendingColor = "orange";
+            } else {
+                spendingColor = "red";
+            }
+            return spendingColor;
+        }
     }
-    
-    el_allowedSpending = document.querySelector("#allowedSpending .output");
-    el_allowedSpending.innerHTML = "$" + allowedSpending;
-
-    document.getElementById("output").classList.remove("hide");
-
 });
+
+// document.getElementById("form").addEventListener("submit", function(e) {
+
+//     e.preventDefault();
+
+//     var cpdata = document.getElementById("rawTransactionData").value;
+//     var mealPlan = document.getElementById("mealPlanOptions").value;
+//     var initialBalance = mealPlanAmounts[mealPlan.split(".")[0]][mealPlan.split(".")[1]];
+//     var prcntWeekendsAway = document.getElementById("prcntWeeksAway").value / 100;
+//     if (!prcntWeekendsAway) {prcntWeekendsAway=0};
+//     var readingWeekAwayF = document.getElementById("awayFallReadingWeek").checked;
+//     var readingWeekAwayW = document.getElementById("awayWinterReadingWeek").checked;
+//     var numIndvDaysAway = document.getElementById("extraDaysAway").value;
+//     if (!numIndvDaysAway) {numIndvDaysAway=0};
+//     var lastExamDayF = document.getElementById("lastExamDayFall").value;
+//     if (!lastExamDayF) {lastExamDayF=21};
+//     var lastExamDayW = document.getElementById("lastExamDayWinter").value;
+//     if (!lastExamDayW) {lastExamDayW=26};
+
+//     allowedSpending = calcAllowedSpending(initialBalance, prcntWeekendsAway, readingWeekAwayF, readingWeekAwayW, numIndvDaysAway, lastExamDayF, lastExamDayW);
+//     //console.log(cpdata);
+//     trns = parseData(cpdata);
+//     totalSpent = calcTotalSpent(trns);
+//     avgSpent = calcAvgSpent(totalSpent);
+    
+//     console.log(trns);
+//     console.log(totalSpent);
+//     console.log(avgSpent);
+//     console.log(allowedSpending);
+
+//     el_avgSpent = document.querySelector("#avgSpent .output");
+//     el_avgSpent.innerHTML = "$" + avgSpent;
+//     if (avgSpent < allowedSpending*0.85) {
+//         el_avgSpent.style.color = "green";
+//     } else if (avgSpent <= allowedSpending) {
+//         el_avgSpent.style.color = "orange";
+//     } else {
+//         el_avgSpent.style.color = "red";
+//     }
+    
+//     el_allowedSpending = document.querySelector("#allowedSpending .output");
+//     el_allowedSpending.innerHTML = "$" + allowedSpending;
+
+//     document.getElementById("output").classList.remove("hide");
+
+// });
 
 </script>
 </body>
