@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="bootstrap-reboot.min.css">
     <script src="https://unpkg.com/vue@2.4.4/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.0/Chart.bundle.min.js"></script>
 </head>
 <body>
 
@@ -74,6 +75,7 @@
 
     <h1 id="avgSpent">Average Spent Per Day: <span class="output" v-bind:style="{ color: spendingColor }">${{ avgSpent }}</span></h1>
     <h2 id="allowedSpending">You are allowed to spend: <span class="output">${{ allowedSpending }}</span></h2>
+    <h3>It costs you ${{ costPerDay }} to eat for a day</h3>
     <h3>You have spent: ${{ totalSpent }} in total</h3>
     <h3>You have ${{ initialBalance - totalSpent }} remaining</h3>
     <h3>If you continue with your current spending, you will have ${{ remainingAmountAvg }} remaining at the end of the year</h3>
@@ -231,88 +233,47 @@ OneWeb ver. 6.9.1.20`,
             var remainingAmountAvg = this.initialBalance - this.avgSpent*this.payingDays
             return remainingAmountAvg.toFixed(2);
         },
+        activeDays: function() {
+            var activeDays = 1;
+            var previousDate = this.trns[0].date;
+
+            for(i = 0; i < this.trns.length; i++) {
+                if(this.trns[i].date != previousDate) {
+                    var previousDate = this.trns[i].date;
+                    activeDays++;
+                }
+            }
+            return activeDays;
+        },
+        costPerDay: function() {
+            var costPerDay = this.totalSpent / this.activeDays;
+            return costPerDay.toFixed(2);
+        },
         locations: function() {
 
-            locations = [];
-            
-            this.trns.forEach(function(entry) {
+            var locations = [];
 
-                
-                
-                for(i =  0; i < locations.length; i++) {
-                    var findMatch = (function() {
-                        if(locations[i].location == entry.place) {
-                            locations[i].timesVisited++;
-                            return true;
-                        }
-                    })(); 
-                    return findMatch;                       
-                };
-
-                if(!findMatch) { 
-                    locations.push({ 
-                        "location": entry.place,
+            for(i = 0; i < this.trns.length; i++) {
+                for(x = 0; x < locations.length; x++) {
+                    var match = false;
+                    if(this.trns[i].place == locations[x].location) {
+                        locations[x].timesVisited++;
+                        match = true;
+                        break;
+                    }
+                }
+                if(!match) {
+                    locations[locations.length] = {
+                        "location": this.trns[i].place,
                         "timesVisited": 1
-                    });  
-                };
-            
-            });
-
+                    }
+                }
+            }
             return locations;
-            // location
-            // amount spent
-            // times visited
-
         }
 
     }
 });
-
-// document.getElementById("form").addEventListener("submit", function(e) {
-
-//     e.preventDefault();
-
-//     var cpdata = document.getElementById("rawTransactionData").value;
-//     var mealPlan = document.getElementById("mealPlanOptions").value;
-//     var initialBalance = mealPlanAmounts[mealPlan.split(".")[0]][mealPlan.split(".")[1]];
-//     var prcntWeekendsAway = document.getElementById("prcntWeeksAway").value / 100;
-//     if (!prcntWeekendsAway) {prcntWeekendsAway=0};
-//     var readingWeekAwayF = document.getElementById("awayFallReadingWeek").checked;
-//     var readingWeekAwayW = document.getElementById("awayWinterReadingWeek").checked;
-//     var numIndvDaysAway = document.getElementById("extraDaysAway").value;
-//     if (!numIndvDaysAway) {numIndvDaysAway=0};
-//     var lastExamDayF = document.getElementById("lastExamDayFall").value;
-//     if (!lastExamDayF) {lastExamDayF=21};
-//     var lastExamDayW = document.getElementById("lastExamDayWinter").value;
-//     if (!lastExamDayW) {lastExamDayW=26};
-
-//     allowedSpending = calcAllowedSpending(initialBalance, prcntWeekendsAway, readingWeekAwayF, readingWeekAwayW, numIndvDaysAway, lastExamDayF, lastExamDayW);
-//     //console.log(cpdata);
-//     trns = parseData(cpdata);
-//     totalSpent = calcTotalSpent(trns);
-//     avgSpent = calcAvgSpent(totalSpent);
-    
-//     console.log(trns);
-//     console.log(totalSpent);
-//     console.log(avgSpent);
-//     console.log(allowedSpending);
-
-//     el_avgSpent = document.querySelector("#avgSpent .output");
-//     el_avgSpent.innerHTML = "$" + avgSpent;
-//     if (avgSpent < allowedSpending*0.85) {
-//         el_avgSpent.style.color = "green";
-//     } else if (avgSpent <= allowedSpending) {
-//         el_avgSpent.style.color = "orange";
-//     } else {
-//         el_avgSpent.style.color = "red";
-//     }
-    
-//     el_allowedSpending = document.querySelector("#allowedSpending .output");
-//     el_allowedSpending.innerHTML = "$" + allowedSpending;
-
-//     document.getElementById("output").classList.remove("hide");
-
-// });
 
 </script>
 </body>
