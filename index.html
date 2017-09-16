@@ -17,8 +17,9 @@
 <form id="form">
     <div id="scrapper">
         <p for="rawTransactionData">Copy and paste all data from <a href="https://mealacct.mcmaster.ca/OneWeb/Account">Meal Plan Account</a> > Financial > Transations:</p>
-        <textarea name="rawTransactionData" id="rawTransactionData" cols="60" rows="5" v-model="cpdata"></textarea>
+        <textarea name="rawTransactionData" id="rawTransactionData" cols="25 " rows="5" v-model="cpdata"></textarea>
     </div>
+    <br>
     <div id="options">        
         <p>
             <label for="mealPlanOptions">Meal Plan:</label>
@@ -71,9 +72,12 @@
 
 <div id="output" v-if="cpdata">
 
-    <h1 id="avgSpent">Average Spent Per Day: <span class="output" v-bind:style="{ color: spendingColor }">{{ avgSpent }}</span></h1>
-    <h2 id="allowedSpending">You are allowed to spend: <span class="output">{{ allowedSpending }}</span></h2>
-
+    <h1 id="avgSpent">Average Spent Per Day: <span class="output" v-bind:style="{ color: spendingColor }">${{ avgSpent }}</span></h1>
+    <h2 id="allowedSpending">You are allowed to spend: <span class="output">${{ allowedSpending }}</span></h2>
+    <h3>You have spent: ${{ totalSpent }} in total</h3>
+    <h3>You have ${{ initialBalance - totalSpent }} remaining</h3>
+    <h3>If you continue with your current spending, you will have ${{ remainingAmountAvg }} remaining at the end of the year</h3>
+    <p>{{ locations }}</p>
 
 </div>
 
@@ -134,7 +138,8 @@ OneWeb ver. 6.9.1.20`,
         numIndvDaysAway: 0,
         lastExamDayF: 21,
         lastExamDayW: 26,
-        numWeekendsAway: 0
+        numWeekendsAway: 0,
+        payingDays: 0
     },
     computed: {
         initialBalance: function() {
@@ -206,8 +211,8 @@ OneWeb ver. 6.9.1.20`,
             var numWeeksTotal = Math.floor(totalDays / 7);
             this.numWeekendsAway = numWeeksTotal * this.prcntWeekendsAway/100;
             var numDaysAway = (this.numWeekendsAway*2) + this.numIndvDaysAway + this.readingWeekAwayF*9 + this.readingWeekAwayW*9;
-            var payingDays = totalDays - numDaysAway;
-            var allowedSpending = this.initialBalance / payingDays;
+            this.payingDays = totalDays - numDaysAway;
+            var allowedSpending = this.initialBalance / this.payingDays;
 
             return allowedSpending.toFixed(2);
         },
@@ -221,7 +226,45 @@ OneWeb ver. 6.9.1.20`,
                 spendingColor = "red";
             }
             return spendingColor;
+        },
+        remainingAmountAvg: function() {
+            var remainingAmountAvg = this.initialBalance - this.avgSpent*this.payingDays
+            return remainingAmountAvg.toFixed(2);
+        },
+        locations: function() {
+
+            locations = [];
+            
+            this.trns.forEach(function(entry) {
+
+                
+                
+                for(i =  0; i < locations.length; i++) {
+                    var findMatch = (function() {
+                        if(locations[i].location == entry.place) {
+                            locations[i].timesVisited++;
+                            return true;
+                        }
+                    })(); 
+                    return findMatch;                       
+                };
+
+                if(!findMatch) { 
+                    locations.push({ 
+                        "location": entry.place,
+                        "timesVisited": 1
+                    });  
+                };
+            
+            });
+
+            return locations;
+            // location
+            // amount spent
+            // times visited
+
         }
+
     }
 });
 
