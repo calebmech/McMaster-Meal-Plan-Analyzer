@@ -16,10 +16,56 @@
 
 <div id="app" class="wrapper">
 
+<h1 class="text-center">McMaster Meal Plan Analyzer</h1>
+<br>
 <form id="form">
     <div class="card">
         <div class="card-header">
-            Copy and paste all data from <a href="https://mealacct.mcmaster.ca/OneWeb/Account">Meal Plan Account</a> > Financial > Transations:
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm">
+                            Copy and paste all data from your entire meal plan term at <a href="https://mealacct.mcmaster.ca/OneWeb/Financial/Transactions" target="_blank">Meal Plan Account</a> > Financial > Transations:
+                    </div>
+                    <div class="col-sm-auto">
+                        <a href="#" class="badge badge-secondary" v-on:click="showHelp = !showHelp">Need help?</a>
+                    </div>
+                </div>
+                <div class="row" v-if="showHelp">
+                    <div class="card border-secondary mt-3">
+                        <div class="card-body">
+                            <h4 class="card-title">Data import instructions</h4>
+                            <p class="card-text">
+                                <ol>
+                                    <li>
+                                        Log on to your meal plan account using your Student number and PIN at <a href="https://mealacct.mcmaster.ca/OneWeb/Account/LogOn" target="_blank">https://mealacct.mcmaster.ca/OneWeb/Account/LogOn</a>.
+                                        <br>
+                                        <span class="font-italic text-muted">Please note that if you have not logged on before, you will have to create a PIN at Account Settings > <a href="https://mealacct.mcmaster.ca/OneWeb/Account/ResetPIN"> Reset Pin</a></span>
+                                    </li>
+                                    <li>
+                                        Navigate to <a href="https://mealacct.mcmaster.ca/OneWeb/Financial/Transactions" target="_blank">https://mealacct.mcmaster.ca/OneWeb/Financial/Transactions</a>, or click Finanical > Transactions.
+                                    </li>
+                                    <li>
+                                        Select a date range starting from before the school year until the current date. 
+                                        <br>
+                                        <span class="font-italic text-muted">The easiest way to do this is by changing the year in the "From" field to a year before the school year started (e.g. 2017 -> 2016)</span>
+                                    </li>
+                                    <li>
+                                        Click on the magnifying glass icon. 
+                                    </li>
+                                    <li>
+                                        Select the entire contents of the page and copy it to your clipboard using the shortcuts <span class="font-italic">Ctrl-A, Ctrl-C</span>.
+                                        <br>
+                                        <span class="font-italic text-muted">(&#8984; - A, &#8984; - C on a Mac)</span> 
+                                    </li>
+                                </ol>
+                                
+                                <button type="button" class="btn btn-outline-secondary btn-sm" v-on:click="showHelp = false">Close</button>
+                            </p>
+                        </div>    
+                    </div>
+                </div>
+            </div>
+            <!-- <button type="button" class="btn btn-outline-info">Need help?</button> -->
         </div>
         <div class="card-body">
             <div id="scrapper" class="form-group">
@@ -90,18 +136,25 @@
     </div>
 </form>
 
-<hr>
 
 <div id="output-data" v-if="cpdata">
+        <hr id="io-seperator">
 
     <p class="h3" id="avgSpent">Average Spent Per Day: <span class="output" v-bind:style="{ color: spendingColor }">${{ avgSpent }}</span></p>
-    <p class="h4" id="allowedSpending">You are allowed to spend: <span class="output">${{ allowedSpending }}</span> per day</p>
+    <p class="h4" id="allowedSpending">You are allowed to spend <span class="output">${{ allowedSpending }}</span> per day</p>
     <br>
-    <p>It costs you <span class="output">${{ costPerDay }}</span> to eat for a day</p>
-    <p>You have spent: <span class="output">${{ totalSpent }}</span> in total</p>
+    <ul class="list-group">
+        <li class="list-group-item">It costs you <span class="output">${{ costPerDay }}</span> to eat for a day</li>
+        <li class="list-group-item">You have spent <span class="output">${{ totalSpent }}</span> in total</li>
+        <li class="list-group-item">You have <span class="output">${{ initialBalance - totalSpent }}</span> remaining</li>
+        <li v-if="remainingAmountAvg > 0" class="list-group-item">If you continue with your current spending, you will have <span class="output">${{ remainingAmountAvg }}</span> remaining at the end of the year</li>
+        <li v-else class="list-group-item">If you continue with your current spending, you will need to add <span class="output">${{ -remainingAmountAvg }}</span> to your account</li>
+    </ul>
+    <!-- <p>It costs you <span class="output">${{ costPerDay }}</span> to eat for a day</p>
+    <p>You have spent <span class="output">${{ totalSpent }}</span> in total</p>
     <p>You have <span class="output">${{ initialBalance - totalSpent }}</span> remaining</p>
     <p v-if="remainingAmountAvg > 0">If you continue with your current spending, you will have <span class="output">${{ remainingAmountAvg }}</span> remaining at the end of the year</p>
-    <p v-else>If you continue with your current spending, you will need to add <span class="output">${{ -remainingAmountAvg }}</span> to your account</p>
+    <p v-else>If you continue with your current spending, you will need to add <span class="output">${{ -remainingAmountAvg }}</span> to your account</p> -->
     <!-- <p>{{ locations }}</p> -->
     <!-- <canvas id="locationVisitDistribution"></canvas> -->
 
@@ -109,54 +162,21 @@
 
 </div>
 
+<footer id="mainFooter">
+    <div id="mainFooterWrapper">
+        <p>Created by Caleb Mech | <a href="https://github.com/cmech/McMaster-Meal-Plan-Analyzer">GitHub</a> </p> 
+        <p><span class="text-muted font-italic"> I am not responsible for any misinformation that you may recieve while using this site. </span></p>
+
+    </div>
+    
+</footer>
+
 <script>
 
 var vm = new Vue({
     el: '#app',
     data: {
-        cpdata: `Logo Image	
-
-ACCOUNT 
-FINANCIAL 
-ADD CASH
- LOG OFF
-Transactions
-Quick Search
-Past 30 days
-Past 60 days
-Select a Date Range
- From:   
-08/26/2017
- To:   
-09/14/2017
-  
-Date	Amount	Balance	Units	Trantype	Terminal
-09/14/2017 7:02:20 PM	-$4.27	1	0	004 : VEND (MONEY)	00084 : BRIDGES-1
-09/14/2017 11:45:44 AM	-$4.24	1	0	004 : VEND (MONEY)	00011 : LAPIAZZA-1
-09/13/2017 7:08:43 PM	-$3.67	1	0	004 : VEND (MONEY)	00084 : BRIDGES-1
-09/13/2017 12:23:54 PM	-$3.75	1	0	004 : VEND (MONEY)	00021 : LAPIAZZA-3
-09/12/2017 7:46:28 PM	-$1.04	1	0	004 : VEND (MONEY)	00046 : MMM-TH
-09/12/2017 6:48:21 PM	-$3.57	1	0	004 : VEND (MONEY)	00046 : MMM-TH
-09/12/2017 12:42:20 PM	-$3.97	1	0	004 : VEND (MONEY)	00048 : LAPIAZZA-4
-09/11/2017 6:55:31 PM	-$2.97	1	0	004 : VEND (MONEY)	00048 : LAPIAZZA-4
-09/11/2017 1:55:52 PM	-$4.12	1	0	004 : VEND (MONEY)	00063 : MMM-1
-09/08/2017 5:47:31 PM	-$3.99	1	0	004 : VEND (MONEY)	00015 : TERIYAKI (MIJ)
-09/07/2017 6:29:31 PM	-$5.94	1	0	004 : VEND (MONEY)	00060 : EMW-2
-09/07/2017 1:32:23 PM	-$3.72	1	0	004 : VEND (MONEY)	00048 : LAPIAZZA-4
-09/06/2017 6:46:53 PM	-$4.99	1	0	004 : VEND (MONEY)	00037 : CENTRO 1
-09/06/2017 12:27:48 PM	-$1.79	1	0	004 : VEND (MONEY)	00138 : LAPIAZZA-2
-09/05/2017 12:08:26 PM	-$4.28	1	0	004 : VEND (MONEY)	00015 : TERIYAKI (MIJ)
-09/01/2017 6:03:16 PM	-$5.60	1	0	004 : VEND (MONEY)	00046 : MMM-TH
-09/01/2017 10:28:46 AM	-$1.92	1	0	004 : VEND (MONEY)	00063 : MMM-1
-08/31/2017 11:18:15 AM	-$4.99	1	0	004 : VEND (MONEY)	00031 : CENTRO 3
-08/30/2017 5:06:23 PM	-$6.49	1	0	004 : VEND (MONEY)	00025 : EMW-1
-08/30/2017 12:25:48 PM	-$3.47	1	0	004 : VEND (MONEY)	00138 : LAPIAZZA-2
-08/28/2017 5:30:38 PM	-$3.57	1	0	004 : VEND (MONEY)	00046 : MMM-TH
-08/28/2017 1:53:28 PM	-$7.02	1	0	004 : VEND (MONEY)	00025 : EMW-1
-08/28/2017 8:29:32 AM	-$4.40	1	0	004 : VEND (MONEY)	00040 : CENTRO 2
-08/26/2017 1:29:18 PM	-$12.95	1	0	102 : ACCOUNT ADJUSTMENT	00053 : FABO MANAGER
- 2014 Heartland Campus Solutions
-// OneWeb ver. 6.9.1.20`,
+        cpdata: "",
         mealPlan: "groupA.minimum",
         prcntWeekendsAway: 10,
         readingWeekAwayF: true,
@@ -166,7 +186,8 @@ Date	Amount	Balance	Units	Trantype	Terminal
         lastExamDayW: 26,
         numWeekendsAway: 0,
         payingDays: 0,
-        moreOptions: false
+        moreOptions: false,
+        showHelp: false
     },
     computed: {
         initialBalance: function() {
@@ -185,12 +206,14 @@ Date	Amount	Balance	Units	Trantype	Terminal
             var trns = [];
 
             for (i = 0; i < numTrns; i++) { 
-                trns.push({ 
-                    date: date[i+2], 
-                    time: time[i],
-                    amount: amount[i],
-                    place: place[i].slice(8) // Fix this hack with regex
-                });
+                if(place[i].slice(8) != "FABO") {
+                    trns.push({ 
+                        date: date[i+2], 
+                        time: time[i],
+                        amount: amount[i],
+                        place: place[i].slice(8) // Fix this hack with regex
+                    });
+                }
             };
 
             trns.reverse();
@@ -208,9 +231,9 @@ Date	Amount	Balance	Units	Trantype	Terminal
         },
         avgSpent: function() {
             var stmntStartDate = Date.parse(this.trns[0].date);
-            var stmntEndDate = Date.parse(this.trns[this.trns.length-1].date)
+            var stmntEndDate = new Date;
 
-            var stmntLength = elapsedDays(stmntStartDate, stmntEndDate);
+            var stmntLength = Math.ceil(elapsedDays(stmntStartDate, stmntEndDate));
 
             // Calculate Average Spent per Day
 
@@ -246,7 +269,7 @@ Date	Amount	Balance	Units	Trantype	Terminal
             return spendingColor;
         },
         remainingAmountAvg: function() {
-            var remainingAmountAvg = this.initialBalance - this.avgSpent*this.payingDays
+            var remainingAmountAvg = this.initialBalance - this.costPerDay*this.payingDays
             return remainingAmountAvg.toFixed(2);
         },
         activeDays: function() {

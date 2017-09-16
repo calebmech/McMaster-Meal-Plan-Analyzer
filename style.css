@@ -5,15 +5,23 @@
     max-width: 960px;
     margin: auto;
     padding: 1em;
+    padding-bottom: 3em;
 }
-#output-data h3 {
-    font-weight: normal;
+#io-seperator {
+    margin-top: 2em;
+    margin-bottom: 2em;
 }
 .output {
     font-weight: bold;
 }
-* {
-    color: hsl(220, 5%, 20%);
+footer#mainFooter {
+    background: #eee;
+    padding: 1em;
+}
+#mainFooterWrapper {
+    max-width: 960px;
+    margin: auto;
+  
 }
 /* #form {
     display: grid;
