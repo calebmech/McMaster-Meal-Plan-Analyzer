@@ -9,22 +9,29 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="bootstrap-reboot.min.css">
     <script src="https://unpkg.com/vue@2.4.4/dist/vue.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.0/Chart.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.0/Chart.bundle.min.js"></script> -->
 </head>
 <body>
 
 <div id="app" class="wrapper">
 
 <form id="form">
-    <div id="scrapper">
-        <p for="rawTransactionData">Copy and paste all data from <a href="https://mealacct.mcmaster.ca/OneWeb/Account">Meal Plan Account</a> > Financial > Transations:</p>
-        <textarea name="rawTransactionData" id="rawTransactionData" cols="25 " rows="5" v-model="cpdata"></textarea>
+    <div class="card">
+        <div class="card-header">
+            Copy and paste all data from <a href="https://mealacct.mcmaster.ca/OneWeb/Account">Meal Plan Account</a> > Financial > Transations:
+        </div>
+        <div class="card-body">
+            <div id="scrapper" class="form-group">
+                <textarea name="rawTransactionData" class="form-control" id="rawTransactionData" cols="25 " rows="5" v-model="cpdata"></textarea>
+            </div>
+        </div>
     </div>
     <br>
     <div id="options">        
-        <p>
+        <div class="form-group">
             <label for="mealPlanOptions">Meal Plan:</label>
-            <select name="mealPlanOptions" id="mealPlanOptions" v-model="mealPlan">
+            <select name="mealPlanOptions" id="mealPlanOptions" v-model="mealPlan" class="form-control">
                 <option value="groupA.minimum">Group A - Minimum</option>
                 <option value="groupA.light">Group A - Light</option>
                 <option value="groupA.regular">Group A - Regular</option>
@@ -35,51 +42,68 @@
                 <option value="groupB.regular">Group B - Regular</option>
                 <option value="groupB.varsity">Group B - Varsity</option>
             </select>
-        </p>
-
-        <p>
-            <label for="prcntWeeksAway">Percentage of weeks away:</label>
-            <input type="number" min="0" max="100" step="1" name="prcntWeekendsAway" id="prcntWeekendsAway" placeholder="25" v-model="prcntWeekendsAway">
-        </p>
-
-        <p>
+        </div>
+        <div class="form-group">
+            <label for="prcntWeeksAway">Percentage of weekends away:</label>
+            <div class="input-group">
+                <input type="number" class="form-control" min="0" max="100" step="1" name="prcntWeekendsAway" id="prcntWeekendsAway" placeholder="25" v-model="prcntWeekendsAway">
+                <span class="input-group-addon">%</span>
+            </div>
+        </div>
+        <div class="form-group">
             <p>Reading weeks away:</p>
-            <label for="awayFallReadingWeek">Fall:</label>
-            <input type="checkbox" name="awayFallReadingWeek" id="awayFallReadingWeek" v-model="readingWeekAwayF">
-            <label for="awayWinterReadingWeek">Winter:</label>
-            <input type="checkbox" name="awayWinterReadingWeek" id="awayWinterReadingWeek" v-model="readingWeekAwayW">
-        </p>
+            <div class="form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" type="checkbox" name="awayFallReadingWeek" id="awayFallReadingWeek" v-model="readingWeekAwayF">
+                    Fall reading week
+                </label>
+            </div>
+            <div class="form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" type="checkbox" name="awayWinterReadingWeek" id="awayWinterReadingWeek" v-model="readingWeekAwayW">
+                    Winter reading week
+                </label>
+            </div>
+        </div>
 
-        <p>
-            <label for="extraDaysAway">Extra Days Away</label>
-            <input type="number" name="extraDaysAway" id="extraDaysAway" placeholder="0" v-model="numIndvDaysAway">
-        </p>
-        
-        <p>
-            <label for="lastExamDayFall">Last fall exam day:</label>
-            <input type="number" name="lastExamDayFall" id="lastExamDayFall" placeholder="Default: 21" v-model="lastExamDayF">
-            <label for="lastExamDayWinter">Last winter exam day:</label>
-            <input type="number" name="lastExamDayWinter" id="lastExamDayWinter" placeholder="Default: 26" v-model="lastExamDayW">
-        </p>
-    </div>
-    <div id="submit">
-        <p>
-            <input type="submit" value="Calculate">
-        </p>
+        <transition name="bounce">
+            <div class="card">
+                <div class="card-header">
+                    <a href="#" v-if="moreOptions" v-on:click.prevent="moreOptions = false">Fewer Options</a>
+                    <a href="#" v-else v-on:click.prevent="moreOptions = true">More Options</a>
+                </div>
+                <div id="moreOptions" class="card-body" v-if="moreOptions">
+                    <div class="form-group">
+                        <label for="extraDaysAway">Extra Days Away:</label>
+                        <input type="number" name="extraDaysAway" id="extraDaysAway" placeholder="0" v-model="numIndvDaysAway" class="form-control">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="lastExamDayFall">Last fall exam day:</label>
+                        <input type="number" name="lastExamDayFall" id="lastExamDayFall" placeholder="Default: 21" v-model="lastExamDayF" class="form-control">
+                        <label for="lastExamDayWinter">Last winter exam day:</label>
+                        <input type="number" name="lastExamDayWinter" id="lastExamDayWinter" placeholder="Default: 26" v-model="lastExamDayW" class="form-control">
+                    </div>
+                </div>
+            </div>
+        </transition>
     </div>
 </form>
 
 <hr>
 
-<div id="output" v-if="cpdata">
+<div id="output-data" v-if="cpdata">
 
-    <h1 id="avgSpent">Average Spent Per Day: <span class="output" v-bind:style="{ color: spendingColor }">${{ avgSpent }}</span></h1>
-    <h2 id="allowedSpending">You are allowed to spend: <span class="output">${{ allowedSpending }}</span></h2>
-    <h3>It costs you ${{ costPerDay }} to eat for a day</h3>
-    <h3>You have spent: ${{ totalSpent }} in total</h3>
-    <h3>You have ${{ initialBalance - totalSpent }} remaining</h3>
-    <h3>If you continue with your current spending, you will have ${{ remainingAmountAvg }} remaining at the end of the year</h3>
-    <p>{{ locations }}</p>
+    <p class="h3" id="avgSpent">Average Spent Per Day: <span class="output" v-bind:style="{ color: spendingColor }">${{ avgSpent }}</span></p>
+    <p class="h4" id="allowedSpending">You are allowed to spend: <span class="output">${{ allowedSpending }}</span> per day</p>
+    <br>
+    <p>It costs you <span class="output">${{ costPerDay }}</span> to eat for a day</p>
+    <p>You have spent: <span class="output">${{ totalSpent }}</span> in total</p>
+    <p>You have <span class="output">${{ initialBalance - totalSpent }}</span> remaining</p>
+    <p v-if="remainingAmountAvg > 0">If you continue with your current spending, you will have <span class="output">${{ remainingAmountAvg }}</span> remaining at the end of the year</p>
+    <p v-else>If you continue with your current spending, you will need to add <span class="output">${{ -remainingAmountAvg }}</span> to your account</p>
+    <!-- <p>{{ locations }}</p> -->
+    <!-- <canvas id="locationVisitDistribution"></canvas> -->
 
 </div>
 
@@ -132,7 +156,7 @@ Date	Amount	Balance	Units	Trantype	Terminal
 08/28/2017 8:29:32 AM	-$4.40	1	0	004 : VEND (MONEY)	00040 : CENTRO 2
 08/26/2017 1:29:18 PM	-$12.95	1	0	102 : ACCOUNT ADJUSTMENT	00053 : FABO MANAGER
  2014 Heartland Campus Solutions
-OneWeb ver. 6.9.1.20`,
+// OneWeb ver. 6.9.1.20`,
         mealPlan: "groupA.minimum",
         prcntWeekendsAway: 10,
         readingWeekAwayF: true,
@@ -141,7 +165,8 @@ OneWeb ver. 6.9.1.20`,
         lastExamDayF: 21,
         lastExamDayW: 26,
         numWeekendsAway: 0,
-        payingDays: 0
+        payingDays: 0,
+        moreOptions: false
     },
     computed: {
         initialBalance: function() {
@@ -149,16 +174,7 @@ OneWeb ver. 6.9.1.20`,
         },
         trns: function() {
             var data = this.cpdata
-
-            // var headerString = "Date	Amount	Balance	Units	Trantype	Terminal";
-            // var headerEndPos = findStringEndPos(data, headerString);
-
-            // var footerString = "2014 Heartland Campus Solutions"
-            // var footerStartPos = data.search(footerString);
-
-            // data = (data.substring(headerEndPos+1, footerStartPos));
-            
-            
+                     
             var date = data.match(/\d{2}\/\d{2}\/\d{4}/g);
             var time = data.match(/\d{1,2}:\d{2}:\d{2} (?:PM|AM)/g);
             var amount = data.match(/-\$\d{1,}.\d{2}/g);
@@ -276,5 +292,7 @@ OneWeb ver. 6.9.1.20`,
 });
 
 </script>
+
+<!-- <script src="charts.js"></script> -->
 </body>
 </html>

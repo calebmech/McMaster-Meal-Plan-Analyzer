@@ -6,6 +6,15 @@
     margin: auto;
     padding: 1em;
 }
+#output-data h3 {
+    font-weight: normal;
+}
+.output {
+    font-weight: bold;
+}
+* {
+    color: hsl(220, 5%, 20%);
+}
 /* #form {
     display: grid;
     grid-template-columns: 1fr 1fr;
