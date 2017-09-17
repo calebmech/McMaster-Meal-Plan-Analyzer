@@ -34,7 +34,7 @@
                             Copy and paste all data from your entire meal plan term at <a href="https://mealacct.mcmaster.ca/OneWeb/Financial/Transactions" target="_blank">Meal Plan Account</a> > Financial > Transations:
                     </div>
                     <div class="col-sm-auto">
-                        <a href="#" class="badge badge-secondary" v-on:click="showHelp = !showHelp">Need help?</a>
+                        <a href="#" class="badge badge-secondary" v-on:click.prevent="showHelp = !showHelp">Need help?</a>
                     </div>
                 </div>
                 <div class="row" v-if="showHelp">
