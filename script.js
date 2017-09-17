@@ -112,7 +112,7 @@ var vm = new Vue({
 
             var numWeeksTotal = Math.floor(totalDays / 7);
             this.numWeekendsAway = numWeeksTotal * this.prcntWeekendsAway/100;
-            var numDaysAway = (this.numWeekendsAway*2) + this.numIndvDaysAway + this.readingWeekAwayF*9 + this.readingWeekAwayW*9;
+            var numDaysAway = (this.numWeekendsAway*2) + parseInt(this.numIndvDaysAway) + this.readingWeekAwayF*9 + this.readingWeekAwayW*9;
             this.payingDays = totalDays - numDaysAway;
             var allowedSpending = this.initialBalance / this.payingDays;
 
