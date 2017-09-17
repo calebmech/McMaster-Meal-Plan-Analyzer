@@ -1,21 +1,3 @@
-var basicAccountA = 3530
-var basicAccountB = 2465
-
-mealPlanAmounts = {
-    groupA: {
-        "minimum": basicAccountA + 250,
-        "light": basicAccountA + 450,
-        "regular": basicAccountA + 650,
-        "varsity": basicAccountA + 850
-    },
-    groupB: {
-        "minimum": basicAccountB + 250,
-        "light": basicAccountB + 450,
-        "regular": basicAccountB + 650,
-        "varsity": basicAccountB + 850
-    }
-};
-
 function elapsedDays(startDate, endDate) {
     timeElapsed = endDate - startDate;
     daysElapsed = ((timeElapsed/1000)/3600)/24;
@@ -40,24 +22,48 @@ var vm = new Vue({
     },
     computed: {
         initialBalance: function() {
-            return mealPlanAmounts[this.mealPlan.split(".")[0]][this.mealPlan.split(".")[1]];
+            var data = this.cpdata
+            
+            var amount = data.match(/(-|)\$[0-9,]{1,}.\d{2}/g);
+            var place = data.match(/[0-9]{5} : [A-Z]{1,}/g);
+            var account = data.match(/	[1,5]	/g);
+
+            var initialBalance = 0;
+
+            for (i = 0; i < amount.length; i++) { 
+                if(place[i].slice(8) == "FABO" && account[i][1] == 1) {
+                    amount[i] = amount[i].replace(/,/g, "");
+                    if(amount[i][0] == "-") {
+                        initialBalance -= parseFloat(amount[i].slice(2));
+                    } else {
+                        initialBalance += parseFloat(amount[i].slice(1));
+                    }    
+
+                } else if(place[i].slice(8) == "FABO" && account[i][1] == 5) {
+                    initialBalance += parseFloat(amount[i].slice(1)/2);
+                }
+            };
+            initialBalance = initialBalance*2;
+            
+            return initialBalance.toFixed(2);
         },
         trns: function() {
             var data = this.cpdata
                      
             var date = data.match(/\d{2}\/\d{2}\/\d{4}/g);
             var time = data.match(/\d{1,2}:\d{2}:\d{2} (?:PM|AM)/g);
-            var amount = data.match(/-\$\d{1,}.\d{2}/g);
+            var amount = data.match(/(-|)\$[0-9,]{1,}.\d{2}/g);
             var place = data.match(/[0-9]{5} : [A-Z]{1,}/g);
             
-            var numTrns = amount.length;
+            var numTrns = place.length;
+            var extraDates = date.length - place.length;
 
             var trns = [];
 
             for (i = 0; i < numTrns; i++) { 
                 if(place[i].slice(8) != "FABO") {
                     trns.push({ 
-                        date: date[i+2], 
+                        date: date[i+extraDates], 
                         time: time[i],
                         amount: amount[i],
                         place: place[i].slice(8) // Fix this hack with regex
@@ -82,7 +88,7 @@ var vm = new Vue({
             var stmntStartDate = Date.parse(this.trns[0].date);
             var stmntEndDate = new Date;
 
-            var stmntLength = Math.ceil(elapsedDays(stmntStartDate, stmntEndDate));
+            var stmntLength = Math.floor(elapsedDays(stmntStartDate, stmntEndDate));
 
             // Calculate Average Spent per Day
 
@@ -136,29 +142,29 @@ var vm = new Vue({
         costPerDay: function() {
             var costPerDay = this.totalSpent / this.activeDays;
             return costPerDay.toFixed(2);
-        },
-        locations: function() {
-
-            var locations = [];
-
-            for(i = 0; i < this.trns.length; i++) {
-                for(x = 0; x < locations.length; x++) {
-                    var match = false;
-                    if(this.trns[i].place == locations[x].location) {
-                        locations[x].timesVisited++;
-                        match = true;
-                        break;
-                    }
-                }
-                if(!match) {
-                    locations[locations.length] = {
-                        "location": this.trns[i].place,
-                        "timesVisited": 1
-                    }
-                }
-            }
-            return locations;
         }
+        // locations: function() {
+
+        //     var locations = [];
+
+        //     for(i = 0; i < this.trns.length; i++) {
+        //         for(x = 0; x < locations.length; x++) {
+        //             var match = false;
+        //             if(this.trns[i].place == locations[x].location) {
+        //                 locations[x].timesVisited++;
+        //                 match = true;
+        //                 break;
+        //             }
+        //         }
+        //         if(!match) {
+        //             locations[locations.length] = {
+        //                 "location": this.trns[i].place,
+        //                 "timesVisited": 1
+        //             }
+        //         }
+        //     }
+        //     return locations;
+        // }
 
     }
 });
