@@ -54,6 +54,7 @@ var vm = new Vue({
             var time = data.match(/\d{1,2}:\d{2}:\d{2} (?:PM|AM)/g);
             var amount = data.match(/(-|)\$[0-9,]{1,}.\d{2}/g);
             var place = data.match(/[0-9]{5} : [A-Z]{1,}/g);
+            var account = data.match(/	[1,5]	/g);
             
             var numTrns = place.length;
             var extraDates = date.length - place.length;
@@ -66,7 +67,8 @@ var vm = new Vue({
                         date: date[i+extraDates], 
                         time: time[i],
                         amount: amount[i],
-                        place: place[i].slice(8) // Fix this hack with regex
+                        place: place[i].slice(8), // Fix this hack with regex
+                        account: account[i][1]
                     });
                 }
             };
@@ -78,7 +80,11 @@ var vm = new Vue({
             var totalSpent = 0;
             this.trns.forEach(function(transation) {
                 if(transation.amount[0] === "-") {
-                    totalSpent += parseFloat(transation.amount.slice(2)) * 2;
+                    if(transation.account == 1) {
+                        totalSpent += parseFloat(transation.amount.slice(2) * 2);
+                    } else if(transation.account == 5) {
+                        totalSpent += parseFloat(transation.amount.slice(2));
+                    }
                 }
             });
             totalSpent = totalSpent.toFixed(2);
