@@ -26,12 +26,22 @@ var vm = new Vue({
             
             var amount = data.match(/(-|)\$[0-9,]{1,}.\d{2}/g);
             var place = data.match(/[0-9]{5} : [A-Z]{1,}/g);
-            var account = data.match(/	[1,5]	/g);
+            if(data.match(/	[1,5]	/g)) {
+                var account = data.match(/	[1,5]	/g);
+                for(i = 0; i < account.length; i++) {
+                    account[i] = account[i][1];
+                }
+            } else {
+                var account = data.match(/\$[0-9,]{1,}.\d{2}\n\d\n/g);
+                for(i = 0; i < account.length; i++) {
+                    account[i] = account[i][account[i].length -2];
+                }
+            }
 
             var initialBalance = 0;
 
             for (i = 0; i < amount.length; i++) { 
-                if(place[i].slice(8) == "FABO" && account[i][1] == 1) {
+                if(place[i].slice(8) == "FABO" && account[i] == 1) {
                     amount[i] = amount[i].replace(/,/g, "");
                     if(amount[i][0] == "-") {
                         initialBalance -= parseFloat(amount[i].slice(2));
@@ -39,7 +49,7 @@ var vm = new Vue({
                         initialBalance += parseFloat(amount[i].slice(1));
                     }    
 
-                } else if(place[i].slice(8) == "FABO" && account[i][1] == 5) {
+                } else if(place[i].slice(8) == "FABO" && account[i] == 5) {
                     initialBalance += parseFloat(amount[i].slice(1)/2);
                 }
             };
@@ -54,7 +64,17 @@ var vm = new Vue({
             var time = data.match(/\d{1,2}:\d{2}:\d{2} (?:PM|AM)/g);
             var amount = data.match(/(-|)\$[0-9,]{1,}.\d{2}/g);
             var place = data.match(/[0-9]{5} : [A-Z]{1,}/g);
-            var account = data.match(/	[1,5]	/g);
+            if(data.match(/	[1,5]	/g)) {
+                var account = data.match(/	[1,5]	/g);
+                for(i = 0; i < account.length; i++) {
+                    account[i] = account[i][1];
+                }
+            } else {
+                var account = data.match(/\$[0-9,]{1,}.\d{2}\n\d\n/g);
+                for(i = 0; i < account.length; i++) {
+                    account[i] = account[i][account[i].length -2];
+                }
+            }
             
             var numTrns = place.length;
             var extraDates = date.length - place.length;
@@ -68,7 +88,7 @@ var vm = new Vue({
                         time: time[i],
                         amount: amount[i],
                         place: place[i].slice(8), // Fix this hack with regex
-                        account: account[i][1]
+                        account: account[i]
                     });
                 }
             };
