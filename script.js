@@ -102,18 +102,27 @@ var vm = new Vue({
             var avgSpent = avgSpent.toFixed(2);
             return avgSpent;
         },
-        allowedSpending: function() {
-            var startDateF = new Date(2017, 08, 05).getTime();
-            var endDateF = new Date(2017, 11, this.lastExamDayF).getTime();
+        totalDays: function() {
+            var firstTrnsDate = this.trns[0].date;
+            var startDateF = new Date(firstTrnsDate.substring(6,10), firstTrnsDate.substring(0,2) - 1, firstTrnsDate.substring(3,5)).getTime();
+            var _lastExamDayF = (this.lastExamDayF === "") ? 21 : this.lastExamDayF;
+            var endDateF = new Date(2017, 11, _lastExamDayF).getTime();
+            var _lastExamDayW = (this.lastExamDayW === "") ? 26 : this.lastExamDayW;
             var startDateW = new Date(2018, 01, 04).getTime();
-            var endDateW = new Date(2018, 04, this.lastExamDayW).getTime();
-
+            var endDateW = new Date(2018, 04, _lastExamDayW).getTime();
+            
             var totalDays = elapsedDays(startDateF, endDateF) + elapsedDays(startDateW, endDateW);
 
-            var numWeeksTotal = Math.floor(totalDays / 7);
+            return totalDays;
+        },
+        allowedSpending: function() {
+
+
+            var numWeeksTotal = Math.floor(this.totalDays / 7);
             this.numWeekendsAway = numWeeksTotal * this.prcntWeekendsAway/100;
-            var numDaysAway = (this.numWeekendsAway*2) + parseInt(this.numIndvDaysAway) + this.readingWeekAwayF*9 + this.readingWeekAwayW*9;
-            this.payingDays = totalDays - numDaysAway;
+            var _numIndvDaysAway = (this.numIndvDaysAway == "") ? 0 : this.numIndvDaysAway;
+            var numDaysAway = (this.numWeekendsAway*2) + parseInt(_numIndvDaysAway) + this.readingWeekAwayF*9 + this.readingWeekAwayW*9;
+            this.payingDays = this.totalDays - numDaysAway;
             var allowedSpending = this.initialBalance / this.payingDays;
 
             return allowedSpending.toFixed(2);
@@ -130,7 +139,7 @@ var vm = new Vue({
             return spendingColor;
         },
         remainingAmountAvg: function() {
-            var remainingAmountAvg = this.initialBalance - this.costPerDay*this.payingDays
+            var remainingAmountAvg = this.initialBalance - this.costPerDay*this.payingDays;
             return remainingAmountAvg.toFixed(2);
         },
         activeDays: function() {

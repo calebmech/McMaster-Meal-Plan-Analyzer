@@ -84,7 +84,7 @@
         <div class="form-group">
             <label for="prcntWeeksAway">Percentage of weekends away:</label>
             <div class="input-group">
-                <input type="number" class="form-control" min="0" max="100" step="1" name="prcntWeekendsAway" id="prcntWeekendsAway" placeholder="25" v-model="prcntWeekendsAway">
+                <input type="number" class="form-control" min="0" max="100" step="1" name="prcntWeekendsAway" id="prcntWeekendsAway" placeholder="0" v-model="prcntWeekendsAway">
                 <span class="input-group-addon">%</span>
             </div>
         </div>
@@ -132,11 +132,17 @@
 <div id="output-data" v-if="cpdata">
         <hr id="io-seperator">
 
-    <p class="h3" id="avgSpent">Average Spent Per Day: <span class="output" v-bind:style="{ color: spendingColor }">${{ avgSpent }}</span></p>
+    <p class="h3" id="avgSpent">It costs you <span class="output" v-bind:style="{ color: spendingColor }">${{ costPerDay }}</span> to eat for a day</p>
+        
     <p class="h4" id="allowedSpending">You are allowed to spend <span class="output">${{ allowedSpending }}</span> per day</p>
     <br>
     <ul class="list-group">
-        <li class="list-group-item">It costs you <span class="output">${{ costPerDay }}</span> to eat for a day</li>
+        <li class="list-group-item">
+            <div class="row justify-content-start">
+                <span class="col-md-auto">On average, you spend <span class="output" >${{ avgSpent }}</span> per day &emsp;</span>
+                <span class="text-muted font-italic col-md-auto">This includes days that you don't purchase anything</span>
+            </div>
+        </li>
         <li class="list-group-item">You have spent <span class="output">${{ totalSpent }}</span> in total</li>
         <li class="list-group-item">You have <span class="output">${{ initialBalance - totalSpent }}</span> remaining</li>
         <li v-if="remainingAmountAvg > 0" class="list-group-item">If you continue with your current spending, you will have <span class="output">${{ remainingAmountAvg }}</span> remaining at the end of the year</li>
@@ -155,5 +161,6 @@
 </footer>
 
 <script src="script.js"></script>
+<script>document.getElementById("rawTransactionData").focus();</script>
 </body>
 </html>
