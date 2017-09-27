@@ -177,6 +177,10 @@ var vm = new Vue({
         costPerDay: function() {
             var costPerDay = this.totalSpent / this.activeDays;
             return costPerDay.toFixed(2);
+        },
+        amountRemaining: function() {
+            var amountRemaining = this.initialBalance - this.totalSpent;
+            return amountRemaining.toFixed(2);
         }
         // locations: function() {
 
