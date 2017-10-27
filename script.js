@@ -190,7 +190,7 @@ var vm = new Vue({
                 transation = this.trns[numTrns - i];
                 daysElapsed = elapsedDays(Date.parse(transation.date), today);
                 if(transation.amount[0] === "-" && daysElapsed < 7) {
-                    if(transation.account == (1 || 2)) {
+                    if(transation.account == 1 || transation.account == 2) {
                         weekAmount += parseFloat(transation.amount.slice(2) * 2);
                     } else if(transation.account == 5) {
                         weekAmount += parseFloat(transation.amount.slice(2));
