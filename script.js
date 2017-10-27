@@ -8,7 +8,6 @@ var vm = new Vue({
     el: '#app',
     data: {
         cpdata: "",
-        mealPlan: "groupA.minimum",
         prcntWeekendsAway: 10,
         readingWeekAwayF: true,
         readingWeekAwayW: true,
@@ -26,8 +25,8 @@ var vm = new Vue({
             
             var amount = data.match(/(-|)\$[0-9,]{1,}.\d{2}/g);
             var place = data.match(/[0-9]{5} : [A-Z]{1,}/g);
-            if(data.match(/	[1,5]	/g)) {
-                var account = data.match(/	[1,5]	/g);
+            if(data.match(/	[1,2,5]	/g)) {
+                var account = data.match(/	[1,2,5]	/g);
                 for(i = 0; i < account.length; i++) {
                     account[i] = account[i][1];
                 }
@@ -41,7 +40,7 @@ var vm = new Vue({
             var initialBalance = 0;
 
             for (i = 0; i < amount.length; i++) { 
-                if(place[i].slice(8) == "FABO" && account[i] == 1) {
+                if(place[i].slice(8) == "FABO" && (account[i] == 1 || account[i] == 2)) {
                     amount[i] = amount[i].replace(/,/g, "");
                     if(amount[i][0] == "-") {
                         initialBalance -= parseFloat(amount[i].slice(2));
@@ -65,7 +64,7 @@ var vm = new Vue({
             var amount = data.match(/(-|)\$[0-9,]{1,}.\d{2}/g);
             var place = data.match(/[0-9]{5} : [A-Z]{1,}/g);
             if(data.match(/	[1,5]	/g)) {
-                var account = data.match(/	[1,5]	/g);
+                var account = data.match(/	[1,2,5]	/g);
                 for(i = 0; i < account.length; i++) {
                     account[i] = account[i][1];
                 }
@@ -100,7 +99,7 @@ var vm = new Vue({
             var totalSpent = 0;
             this.trns.forEach(function(transation) {
                 if(transation.amount[0] === "-") {
-                    if(transation.account == 1) {
+                    if(transation.account == 1 || transation.account == 2) {
                         totalSpent += parseFloat(transation.amount.slice(2) * 2);
                     } else if(transation.account == 5) {
                         totalSpent += parseFloat(transation.amount.slice(2));
@@ -136,8 +135,6 @@ var vm = new Vue({
             return totalDays;
         },
         allowedSpending: function() {
-
-
             var numWeeksTotal = Math.floor(this.totalDays / 7);
             this.numWeekendsAway = numWeeksTotal * this.prcntWeekendsAway/100;
             var _numIndvDaysAway = (this.numIndvDaysAway == "") ? 0 : this.numIndvDaysAway;
@@ -181,6 +178,27 @@ var vm = new Vue({
         amountRemaining: function() {
             var amountRemaining = this.initialBalance - this.totalSpent;
             return amountRemaining.toFixed(2);
+        },
+        pastWeekAmount: function() {
+            var daysElapsed = 0;
+            var numTrns = this.trns.length - 1;
+            var i = 0;
+            var today = new Date;
+            var weekAgoTrns = 0;
+            var weekAmount = 0;
+            while (daysElapsed < 7) {
+                transation = this.trns[numTrns - i];
+                daysElapsed = elapsedDays(Date.parse(transation.date), today);
+                if(transation.amount[0] === "-" && daysElapsed < 7) {
+                    if(transation.account == (1 || 2)) {
+                        weekAmount += parseFloat(transation.amount.slice(2) * 2);
+                    } else if(transation.account == 5) {
+                        weekAmount += parseFloat(transation.amount.slice(2));
+                    }
+                }
+                i++;
+            }
+            return weekAmount;
         }
         // locations: function() {
 
