@@ -146,12 +146,12 @@ var vm = new Vue({
         },
         spendingColor: function() {
             spendingColor = "black";
-            if (this.avgSpent < this.allowedSpending*0.85) {
+            if (this.costPerDay < this.allowedSpending*0.85) {
                 spendingColor = "green";
-            } else if (this.avgSpent <= this.allowedSpending) {
-                spendingColor = "orange";
-            } else {
+            } else if (this.costPerDay > this.allowedSpending) {
                 spendingColor = "red";
+            } else {
+                spendingColor = "orange";
             }
             return spendingColor;
         },
