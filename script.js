@@ -198,7 +198,7 @@ var vm = new Vue({
                 }
                 i++;
             }
-            return weekAmount;
+            return weekAmount.toFixed(2);
         }
         // locations: function() {
 
