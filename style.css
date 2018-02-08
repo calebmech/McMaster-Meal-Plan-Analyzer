@@ -24,33 +24,3 @@ footer#mainFooter {
     margin: auto;
   
 }
-/* body {
-    display: flex;
-    min-height: 100vh;
-    flex-direction: column;
-} */
-/* #form {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto;
-    
-}
-
-#form #scrapper {
-    grid-column: 1 / 1;
-    grid-row: 1 / 1;
-}
-
-#form #options {
-    grid-column: 2 / 2;
-    grid-row: 1 / 1;
-}
-
-#form #submit {
-    grid-column: 1 / 2;
-    grid-row: 2 / 2;
-}
-
-#rawTransactionData {
-    width: 80%;
-} */
